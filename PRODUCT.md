@@ -16,6 +16,8 @@ Connect an authorized GREEN-API Telegram instance, create a conversation by phon
 ## Capabilities and Constraints
 Text only. Minimal messenger interface. Credentials entered at runtime and held in memory. Approximately 20–30 feature/fix commits requested by the user. No real credentials supplied yet; live delivery remains unverified until an authorized instance is available.
 
+Follow-up: show existing Telegram conversations after connection, and load the last 100 messages on selection. Render text only, merge history with live replies, and respect service-method rate limits. The user has connected their own instance in their browser; verification by the agent continues with synthetic API responses, without accessing that session's credentials.
+
 ## Brand Commitments
 Messenger-style two-column layout from the assignment; Telegram replaces MAX by explicit user instruction. Russian interface, inferred from the conversation.
 
