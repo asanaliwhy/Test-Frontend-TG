@@ -5,6 +5,11 @@
 .sidebar-heading { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px 10px; }
 .sidebar-heading h1 { font-size: 19px; font-weight: 800; display: flex; gap: 8px; align-items: center; }
 .sidebar-heading h1 span { font-size: 11px; color: var(--muted); background: #edf2f6; border-radius: 6px; padding: 3px 6px; letter-spacing: 0; }
+.sidebar-actions { display: flex; align-items: center; gap: 5px; }
+.sidebar-actions .icon-button { width: 34px; height: 34px; }
+.sidebar-feedback { margin: 0 20px 12px; font-size: 11px; color: var(--muted); line-height: 1.8; }
+.sidebar-feedback.error { color: var(--danger); }
+.history-feedback { background: #f6f9fb; color: var(--muted); padding: 9px 28px; font-size: 11px; }
 .new-chat-button { color: var(--accent); background: #eaf5fc; width: 34px; height: 34px; border-radius: 10px; }
 .search-field { margin: 0 20px 18px; display: flex; gap: 10px; align-items: center; background: #f0f4f7; color: var(--muted); border-radius: 9px; padding: 11px 12px; }
 .search-field input { border: 0; background: none; min-width: 0; width: 100%; color: var(--ink); font-size: 12px; outline-offset: 6px; }

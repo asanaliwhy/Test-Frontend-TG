@@ -3,6 +3,7 @@ import { ArrowLeft, Info, MessageCircle, Plus, RefreshCw } from 'lucide-react'
 import type { ChatApi } from '../api/types'
 import type { ChatState } from '../chat/store'
 import { useChat } from '../chat/useChat'
+import { useConversationSync } from '../chat/useConversationSync'
 import { Sidebar } from './Sidebar'
 import { NewChat } from './NewChat'
 import { Avatar } from './Avatar'
@@ -13,6 +14,7 @@ import './chat.css'
 
 export function ChatWorkspace({ api, demo, seed, onExit }: { api: ChatApi; demo: boolean; seed?: ChatState; onExit: () => void }) {
   const { state, dispatch, send, status, connectionError, reconnect } = useChat(api, seed)
+  const sync = useConversationSync(api, state.activeId, dispatch, !demo)
   const [creating, setCreating] = useState(false)
   const [drafts, setDrafts] = useState<Record<string, string>>({})
   const [help, setHelp] = useState(false)
@@ -21,7 +23,7 @@ export function ChatWorkspace({ api, demo, seed, onExit }: { api: ChatApi; demo:
 
   return <main className="chat-page">
     <div className={`workspace${active || creating ? ' show-conversation' : ''}`}>
-      <Sidebar state={state} status={status} demo={demo} onSelect={(id) => { dispatch({ type: 'select', id }); setCreating(false) }} onNew={() => setCreating(true)} onExit={onExit} />
+      <Sidebar state={state} status={status} demo={demo} listStatus={sync.listStatus} listError={sync.listError} onRefresh={sync.reloadChats} onSelect={(id) => { dispatch({ type: 'select', id }); setCreating(false) }} onNew={() => setCreating(true)} onExit={onExit} />
       <section className="chat-surface" aria-label="Переписка">
         {demo && <div className="demo-banner"><span>Деморежим · сообщения не отправляются в Telegram</span><button onClick={onExit}>Подключить аккаунт</button></div>}
         {!demo && <SettingsNotice api={api} />}
@@ -29,7 +31,9 @@ export function ChatWorkspace({ api, demo, seed, onExit }: { api: ChatApi; demo:
         {creating ? <NewChat api={api} chats={state.chats} onCancel={() => setCreating(false)} onOpen={(chat) => { dispatch({ type: 'open', chat }); setCreating(false) }} /> : active ? <>
           <header className="conversation-header"><button className="icon-button mobile-back" onClick={() => dispatch({ type: 'select', id: null })} aria-label="Все чаты"><ArrowLeft size={21} /></button><Avatar name={active.name} large /><div className="contact-heading"><h2>{active.name}</h2><p>{active.phone ? `+${active.phone}` : 'Telegram'}<span>Текстовая переписка</span></p></div><button className="icon-button help-button" onClick={() => setHelp(!help)} aria-label="Информация о переписке" aria-expanded={help}><Info size={21} /></button></header>
           {help && <div className="notice">Сообщения и черновики доступны до выхода или обновления вкладки. Статусы доставки зависят от настроек уведомлений GREEN-API.</div>}
-          <Timeline key={`timeline-${active.id}`} messages={messages} />
+          {sync.history?.loading && <div className="history-feedback" role="status">Загружаем последние 100 сообщений…</div>}
+          {sync.history?.error && <div className="notice" role="status">Не удалось загрузить историю. {sync.history.error} <button className="text-button" onClick={sync.retryHistory}>Повторить загрузку истории</button></div>}
+          <Timeline key={`timeline-${active.id}`} messages={messages} loading={sync.history?.loading ?? false} />
           <Composer key={`composer-${active.id}`} draft={drafts[active.id] ?? ''} onDraft={(value) => setDrafts((previous) => ({ ...previous, [active.id]: value }))} onSend={(text) => send(active.id, text)} disabled={status === 'stopped'} />
         </> : <div className="chat-empty"><MessageCircle size={62} strokeWidth={1.15} /><h2>Ваш следующий разговор</h2><p>Выберите чат слева или начните новый по номеру телефона получателя.</p><button className="button primary" onClick={() => setCreating(true)}><Plus size={17} /> Новый чат</button></div>}
       </section>

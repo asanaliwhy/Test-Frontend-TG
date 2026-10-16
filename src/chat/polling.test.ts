@@ -4,7 +4,7 @@ import type { ChatApi, Notification } from '../api/types'
 import { pollNotifications } from './polling'
 
 const notification: Notification = { receiptId: 42, body: { typeWebhook: 'unknownEvent' } }
-const mockApi = (): ChatApi => ({ getState: vi.fn(), getSettings: vi.fn(), checkAccount: vi.fn(), sendMessage: vi.fn(), receive: vi.fn(), acknowledge: vi.fn() })
+const mockApi = (): ChatApi => ({ getState: vi.fn(), getSettings: vi.fn(), getChats: vi.fn(), getChatHistory: vi.fn(), checkAccount: vi.fn(), sendMessage: vi.fn(), receive: vi.fn(), acknowledge: vi.fn() })
 afterEach(() => vi.useRealTimers())
 
 describe('sequential notification consumer', () => {

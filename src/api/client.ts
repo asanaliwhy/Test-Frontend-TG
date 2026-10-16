@@ -1,4 +1,4 @@
-import type { AccountResult, ChatApi, Credentials, InstanceSettings, Notification } from './types'
+import type { AccountResult, ChatApi, Credentials, HistoryMessage, InstanceSettings, Notification, RemoteChat } from './types'
 import { createRequestGate, waitForRequest } from './rateLimit'
 
 export class ApiError extends Error {
@@ -53,6 +53,10 @@ export function createApi(credentials: Credentials): ChatApi {
   return {
     getState: (signal) => request<{ stateInstance: string }>('getStateInstance', { signal }),
     getSettings: (signal) => request<InstanceSettings>('getSettings', { signal }),
+    getChats: (signal) => request<RemoteChat[]>('getChats', { signal }),
+    getChatHistory: (chatId, signal) => request<HistoryMessage[]>('getChatHistory', {
+      verb: 'POST', body: { chatId, count: 100 }, signal,
+    }),
     checkAccount: (phone, signal) => request<AccountResult>('checkAccount', {
       verb: 'POST', body: { phoneNumber: Number(phone) }, signal,
     }),

@@ -9,7 +9,7 @@ function DeliveryIcon({ status }: { status: Delivery }) {
   return <span className={`delivery ${status}`} title={labels[status]} aria-label={labels[status]}><Icon size={14} strokeWidth={1.8} /></span>
 }
 
-export function Timeline({ messages }: { messages: Message[] }) {
+export function Timeline({ messages, loading = false }: { messages: Message[]; loading?: boolean }) {
   const viewport = useRef<HTMLDivElement>(null)
   const stick = useRef(true)
   const [below, setBelow] = useState(false)
@@ -29,7 +29,7 @@ export function Timeline({ messages }: { messages: Message[] }) {
     stick.current = node.scrollHeight - node.scrollTop - node.clientHeight < 100
     if (stick.current) setBelow(false)
   }}>
-    {messages.length === 0 && <div className="first-message"><span>Начало переписки</span><p>Поздоровайтесь — первое сообщение за вами.</p></div>}
+    {messages.length === 0 && !loading && <div className="first-message"><span>Нет загруженных текстовых сообщений</span><p>Напишите сообщение, чтобы продолжить разговор.</p></div>}
     {messages.map((message, index) => {
       const date = new Date(message.timestamp).toLocaleDateString('ru', { day: 'numeric', month: 'long' })
       const previous = messages[index - 1]

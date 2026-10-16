@@ -33,6 +33,11 @@ export function createDemo(): { api: ChatApi; state: ChatState } {
   const api: ChatApi = {
     getState: async () => ({ stateInstance: 'authorized' }),
     getSettings: async () => ({ incomingWebhook: 'yes', outgoingWebhook: 'yes', webhookUrl: '' }),
+    getChats: async () => state.chats.map((chat) => ({ chatId: chat.id, name: chat.name })),
+    getChatHistory: async (id) => (state.messages[id] ?? []).map((message) => ({
+      idMessage: message.id, chatId: id, type: message.direction, timestamp: message.timestamp / 1000,
+      typeMessage: 'textMessage', textMessage: message.text, statusMessage: message.status,
+    })),
     checkAccount: async (phone) => ({ exist: true, chatId: `demo-${phone}`, phoneNumber: Number(phone) }),
     sendMessage: async (id, message) => {
       const idMessage = crypto.randomUUID()

@@ -5,6 +5,17 @@ const credentials = { idInstance: '4100000000', apiTokenInstance: 'test_runtime_
 afterEach(() => vi.unstubAllGlobals())
 
 describe('GREEN-API Telegram transport', () => {
+  it('loads existing chats and the last 100 messages of the selected conversation', async () => {
+    const fetcher = vi.fn().mockImplementation(async () => new Response('[]'))
+    vi.stubGlobal('fetch', fetcher)
+    const api = createApi(credentials)
+    await api.getChats()
+    await api.getChatHistory('12345')
+    expect(fetcher.mock.calls[0][0]).toContain('/getChats/')
+    expect(fetcher.mock.calls[0][1].method).toBe('GET')
+    expect(fetcher.mock.calls[1][0]).toContain('/getChatHistory/')
+    expect(JSON.parse(fetcher.mock.calls[1][1].body)).toEqual({ chatId: '12345', count: 100 })
+  })
   it('uses the documented instance path and sends canonical chat ID', async () => {
     const fetcher = vi.fn().mockResolvedValue(new Response(JSON.stringify({ idMessage: 'server-id' })))
     vi.stubGlobal('fetch', fetcher)

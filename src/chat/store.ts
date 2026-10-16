@@ -27,6 +27,8 @@ export type ChatAction =
   | { type: 'message'; message: Message; name?: string; phone?: string }
   | { type: 'update'; chatId: string; id: string; patch: Partial<Pick<Message, 'id' | 'status' | 'error'>> }
   | { type: 'reset' }
+  | { type: 'sync-chats'; chats: Omit<Chat, 'unread'>[] }
+  | { type: 'history'; chatId: string; messages: Message[] }
 
 const order: Record<Delivery, number> = { sending: 0, queued: 1, sent: 2, delivered: 3, read: 4, failed: 5 }
 export function advanceStatus(current: Delivery, next: Delivery): Delivery {
@@ -36,6 +38,19 @@ export function advanceStatus(current: Delivery, next: Delivery): Delivery {
 export function chatReducer(state: ChatState, action: ChatAction): ChatState {
   switch (action.type) {
     case 'reset': return initialState
+    case 'sync-chats': {
+      const chats = new Map(state.chats.map((chat) => [chat.id, chat]))
+      for (const chat of action.chats) chats.set(chat.id, { ...chats.get(chat.id), ...chat, unread: chats.get(chat.id)?.unread ?? 0 })
+      return { ...state, chats: [...chats.values()] }
+    }
+    case 'history': {
+      const merged = new Map(action.messages.filter((message) => message.chatId === action.chatId).map((message) => [message.id, message]))
+      for (const message of state.messages[action.chatId] ?? []) {
+        const historical = merged.get(message.id)
+        merged.set(message.id, historical ? { ...historical, ...message, status: advanceStatus(message.status, historical.status) } : message)
+      }
+      return { ...state, messages: { ...state.messages, [action.chatId]: [...merged.values()].sort((a, b) => a.timestamp - b.timestamp) } }
+    }
     case 'open': {
       const exists = state.chats.some((chat) => chat.id === action.chat.id)
       return {

@@ -46,9 +46,30 @@ export interface InstanceSettings {
   outgoingAPIMessageWebhook?: string
 }
 
+export interface RemoteChat {
+  chatId: string
+  name?: string
+  type?: string
+  phoneNumber?: number
+  username?: string
+}
+
+export interface HistoryMessage {
+  idMessage: string
+  chatId: string
+  type: 'incoming' | 'outgoing'
+  timestamp: number
+  typeMessage: string
+  textMessage?: string
+  statusMessage?: string
+  isDeleted?: boolean
+}
+
 export interface ChatApi {
   getState(signal?: AbortSignal): Promise<{ stateInstance: string }>
   getSettings(signal?: AbortSignal): Promise<InstanceSettings>
+  getChats(signal?: AbortSignal): Promise<RemoteChat[]>
+  getChatHistory(chatId: string, signal?: AbortSignal): Promise<HistoryMessage[]>
   checkAccount(phone: string, signal?: AbortSignal): Promise<AccountResult>
   sendMessage(chatId: string, message: string, signal?: AbortSignal): Promise<{ idMessage: string }>
   receive(signal?: AbortSignal): Promise<Notification | null>
