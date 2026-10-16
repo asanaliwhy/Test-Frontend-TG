@@ -31,6 +31,14 @@ describe('conversation state', () => {
     const state = chatReducer(initialState, { type: 'message', message })
     expect(chatReducer(state, { type: 'reset' })).toEqual(initialState)
   })
+  it('preserves delivery that arrives before the send HTTP response', () => {
+    let state = chatReducer(initialState, { type: 'message', message: { ...message, id: 'local', direction: 'outgoing', status: 'sending' } })
+    state = chatReducer(state, { type: 'update', chatId: '100', id: 'remote', patch: { status: 'read' } })
+    state = chatReducer(state, { type: 'update', chatId: '100', id: 'remote', patch: { status: 'sent' } })
+    state = chatReducer(state, { type: 'update', chatId: '100', id: 'local', patch: { id: 'remote', status: 'queued' } })
+    expect(state.messages['100'][0]).toMatchObject({ id: 'remote', status: 'read' })
+    expect(state.earlyStatuses).toEqual({})
+  })
 })
 
 describe('Telegram event routing', () => {

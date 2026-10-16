@@ -18,6 +18,7 @@ export interface ChatState {
   chats: Chat[]
   messages: Record<string, Message[]>
   activeId: string | null
+  earlyStatuses?: Record<string, { status?: Delivery; error?: string }>
 }
 export const initialState: ChatState = { chats: [], messages: {}, activeId: null }
 export type ChatAction =
@@ -63,13 +64,29 @@ export function chatReducer(state: ChatState, action: ChatAction): ChatState {
     }
     case 'update': {
       const messages = state.messages[action.chatId] ?? []
+      const key = `${action.chatId}:${action.patch.id ?? action.id}`
+      if (!messages.some((message) => message.id === action.id)) {
+        const earlyStatuses = { ...state.earlyStatuses }
+        const previous = earlyStatuses[key]
+        earlyStatuses[key] = {
+          ...previous, ...action.patch,
+          status: previous?.status && action.patch.status ? advanceStatus(previous.status, action.patch.status) : action.patch.status ?? previous?.status,
+        }
+        // Bound statuses for messages sent outside this session.
+        const keys = Object.keys(earlyStatuses)
+        if (keys.length > 500) delete earlyStatuses[keys[0]]
+        return { ...state, earlyStatuses }
+      }
+      const earlyStatuses = { ...state.earlyStatuses }
+      const early = earlyStatuses[key]
+      delete earlyStatuses[key]
       return {
-        ...state,
+        ...state, earlyStatuses,
         messages: {
           ...state.messages,
           [action.chatId]: messages.map((message) => message.id === action.id ? {
-            ...message, ...action.patch,
-            status: action.patch.status ? advanceStatus(message.status, action.patch.status) : message.status,
+            ...message, ...action.patch, ...early,
+            status: advanceStatus(action.patch.status ? advanceStatus(message.status, action.patch.status) : message.status, early?.status ?? message.status),
           } : message),
         },
       }
