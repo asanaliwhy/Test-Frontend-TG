@@ -29,8 +29,8 @@ export function ChatWorkspace({ api, demo, seed, onExit }: { api: ChatApi; demo:
         {creating ? <NewChat api={api} chats={state.chats} onCancel={() => setCreating(false)} onOpen={(chat) => { dispatch({ type: 'open', chat }); setCreating(false) }} /> : active ? <>
           <header className="conversation-header"><button className="icon-button mobile-back" onClick={() => dispatch({ type: 'select', id: null })} aria-label="Все чаты"><ArrowLeft size={21} /></button><Avatar name={active.name} large /><div className="contact-heading"><h2>{active.name}</h2><p>{active.phone ? `+${active.phone}` : 'Telegram'}<span>Текстовая переписка</span></p></div><button className="icon-button help-button" onClick={() => setHelp(!help)} aria-label="Информация о переписке" aria-expanded={help}><Info size={21} /></button></header>
           {help && <div className="notice">Сообщения и черновики доступны до выхода или обновления вкладки. Статусы доставки зависят от настроек уведомлений GREEN-API.</div>}
-          <Timeline key={active.id} messages={messages} />
-          <Composer key={active.id} draft={drafts[active.id] ?? ''} onDraft={(value) => setDrafts((previous) => ({ ...previous, [active.id]: value }))} onSend={(text) => send(active.id, text)} disabled={status === 'stopped'} />
+          <Timeline key={`timeline-${active.id}`} messages={messages} />
+          <Composer key={`composer-${active.id}`} draft={drafts[active.id] ?? ''} onDraft={(value) => setDrafts((previous) => ({ ...previous, [active.id]: value }))} onSend={(text) => send(active.id, text)} disabled={status === 'stopped'} />
         </> : <div className="chat-empty"><MessageCircle size={62} strokeWidth={1.15} /><h2>Ваш следующий разговор</h2><p>Выберите чат слева или начните новый по номеру телефона получателя.</p><button className="button primary" onClick={() => setCreating(true)}><Plus size={17} /> Новый чат</button></div>}
       </section>
     </div>
