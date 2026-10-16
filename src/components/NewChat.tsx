@@ -41,7 +41,7 @@ export function NewChat({ api, chats, onOpen, onCancel }: {
     <header className="conversation-header"><button className="icon-button" onClick={onCancel} aria-label="Вернуться к чатам"><ArrowLeft size={21} /></button><strong>Новый разговор</strong></header>
     <div className="new-chat-body"><UserRoundPlus size={42} strokeWidth={1.5} /><h2 id="new-chat-title">Кому напишем?</h2><p>Введите номер телефона получателя.<br />Он должен пользоваться Telegram.</p>
       <form onSubmit={submit} aria-busy={busy}>
-        <label className="field">Номер телефона<input type="tel" autoFocus autoComplete="tel" placeholder="+7 700 123 45 67" value={phone} onChange={(e) => setPhone(e.target.value)} disabled={busy} required aria-describedby="phone-help" /><small id="phone-help">В международном формате, с кодом страны</small></label>
+        <label className="field">Номер телефона<input type="tel" aria-label="Номер телефона" autoFocus autoComplete="tel" placeholder="+7 700 123 45 67" value={phone} onChange={(e) => setPhone(e.target.value)} disabled={busy} required aria-describedby="phone-help" /><small id="phone-help">В международном формате, с кодом страны</small></label>
         {error && <p className="error" role="alert">{error}</p>}
         <button type="submit" className="button primary" disabled={busy}>{busy ? <><LoaderCircle size={18} className="spin" /> Ищем контакт…</> : <>Начать разговор <ArrowRight size={18} /></>}</button>
       </form>
