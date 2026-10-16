@@ -7,6 +7,7 @@ import { NewChat } from './NewChat'
 import { Avatar } from './Avatar'
 import { Timeline } from './Timeline'
 import { Composer } from './Composer'
+import { SettingsNotice } from './SettingsNotice'
 import './chat.css'
 
 export function ChatWorkspace({ api, demo, onExit }: { api: ChatApi; demo: boolean; onExit: () => void }) {
@@ -22,6 +23,7 @@ export function ChatWorkspace({ api, demo, onExit }: { api: ChatApi; demo: boole
       <Sidebar state={state} status={status} demo={demo} onSelect={(id) => { dispatch({ type: 'select', id }); setCreating(false) }} onNew={() => setCreating(true)} onExit={onExit} />
       <section className="chat-surface" aria-label="Переписка">
         {demo && <div className="demo-banner"><span>Деморежим · сообщения не отправляются в Telegram</span><button onClick={onExit}>Подключить аккаунт</button></div>}
+        {!demo && <SettingsNotice api={api} />}
         {connectionError && <div className="notice" role="status">{connectionError} <button className="text-button" onClick={reconnect}><RefreshCw size={13} /> Повторить подключение</button></div>}
         {creating ? <NewChat api={api} chats={state.chats} onCancel={() => setCreating(false)} onOpen={(chat) => { dispatch({ type: 'open', chat }); setCreating(false) }} /> : active ? <>
           <header className="conversation-header"><button className="icon-button mobile-back" onClick={() => dispatch({ type: 'select', id: null })} aria-label="Все чаты"><ArrowLeft size={21} /></button><Avatar name={active.name} large /><div className="contact-heading"><h2>{active.name}</h2><p>{active.phone ? `+${active.phone}` : 'Telegram'}<span>Текстовая переписка</span></p></div><button className="icon-button help-button" onClick={() => setHelp(!help)} aria-label="Информация о переписке" aria-expanded={help}><Info size={21} /></button></header>
