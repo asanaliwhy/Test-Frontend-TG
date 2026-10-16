@@ -29,18 +29,19 @@ export function Timeline({ messages, loading = false }: { messages: Message[]; l
     stick.current = node.scrollHeight - node.scrollTop - node.clientHeight < 100
     if (stick.current) setBelow(false)
   }}>
-    {messages.length === 0 && !loading && <div className="first-message"><span>Нет загруженных текстовых сообщений</span><p>Напишите сообщение, чтобы продолжить разговор.</p></div>}
+    <div className="timeline-content">{messages.length === 0 && !loading && <div className="first-message"><span>Нет загруженных текстовых сообщений</span><p>Напишите сообщение, чтобы продолжить разговор.</p></div>}
     {messages.map((message, index) => {
       const date = new Date(message.timestamp).toLocaleDateString('ru', { day: 'numeric', month: 'long' })
       const previous = messages[index - 1]
       const separator = !previous || new Date(previous.timestamp).toDateString() !== new Date(message.timestamp).toDateString()
-      return <div className="message-group" key={message.id}>
+      const continued = !separator && previous?.direction === message.direction
+      return <div className={`message-group${continued ? ' continued' : ''}`} key={message.id}>
         {separator && <div className="date-separator"><span>{date}</span></div>}
         <article className={`message ${message.direction}${message.status === 'failed' ? ' message-failed' : ''}`} aria-label={message.direction === 'outgoing' ? 'Ваше сообщение' : 'Входящее сообщение'}>
           <p>{message.text}</p><div className="message-meta"><time dateTime={new Date(message.timestamp).toISOString()}>{new Date(message.timestamp).toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' })}</time>{message.direction === 'outgoing' && <DeliveryIcon status={message.status} />}</div>
           {message.error && <p className="message-error">{message.error}</p>}
         </article>
       </div>
-    })}
+    })}</div>
   </div>{below && <button className="scroll-bottom" onClick={bottom} aria-label="К новым сообщениям"><ArrowDown size={18} /> Новые сообщения</button>}</div>
 }

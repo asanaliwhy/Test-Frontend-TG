@@ -39,7 +39,7 @@
     {
       "name": "Outgoing bubble", "kind": "custom", "description": "Text and timestamp for an outgoing message.",
       "html": "<article class=\"ds-bubble\">Привет! Как дела?<small>12:34</small></article>",
-      "css": ".ds-bubble{width:fit-content;max-width:78%;border-radius:14px 14px 4px 14px;padding:12px 14px 8px;background:var(--outgoing,#deeffa);color:var(--ink,#192c3c);font:400 13px/1.8 Manrope,sans-serif}.ds-bubble small{display:block;text-align:right;color:#526c7d;font-size:9px}"
+      "css": ".ds-bubble{width:fit-content;max-width:78%;border-radius:14px 14px 4px 14px;padding:9px 13px 6px;background:var(--outgoing,#deeffa);color:var(--ink,#192c3c);font:400 15px/1.55 Manrope,sans-serif}.ds-bubble small{display:block;text-align:right;color:#526c7d;font-size:11px}"
     }
   ],
   "narrative": {
