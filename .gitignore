@@ -8,3 +8,4 @@ output/
 coverage/
 .impeccable/review/
 .playwright-cli/
+.vercel/

@@ -1,0 +1,11 @@
+.git
+.github
+.impeccable
+.playwright-cli
+.vercel
+node_modules
+output
+coverage
+dist
+*.tsbuildinfo
+.env*
