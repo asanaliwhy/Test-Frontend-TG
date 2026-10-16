@@ -64,15 +64,25 @@ export function chatReducer(state: ChatState, action: ChatAction): ChatState {
       chats: state.chats.map((chat) => chat.id === action.id ? { ...chat, unread: 0 } : chat),
     }
     case 'message': {
-      const message = action.message
+      const key = `${action.message.chatId}:${action.message.id}`
+      const early = state.earlyStatuses?.[key]
+      const message = { ...action.message, ...early, status: early?.status ? advanceStatus(action.message.status, early.status) : action.message.status }
       const previous = state.messages[message.chatId] ?? []
-      if (previous.some((item) => item.id === message.id)) return state
+      const existing = previous.find((item) => item.id === message.id)
+      if (existing) {
+        if (message.direction === 'outgoing' && existing.direction === 'outgoing' && advanceStatus(existing.status, message.status) !== existing.status) {
+          return chatReducer(state, { type: 'update', chatId: message.chatId, id: message.id, patch: { status: message.status } })
+        }
+        return state
+      }
+      const earlyStatuses = { ...state.earlyStatuses }
+      delete earlyStatuses[key]
       const chat = state.chats.find((item) => item.id === message.chatId) ?? {
         id: message.chatId, name: action.name || action.phone || message.chatId, phone: action.phone, unread: 0,
       }
       const unread = message.direction === 'incoming' && state.activeId !== chat.id ? chat.unread + 1 : chat.unread
       return {
-        ...state,
+        ...state, earlyStatuses,
         chats: [{ ...chat, unread }, ...state.chats.filter((item) => item.id !== chat.id)],
         messages: { ...state.messages, [chat.id]: [...previous, message].sort((a, b) => a.timestamp - b.timestamp) },
       }
@@ -95,14 +105,21 @@ export function chatReducer(state: ChatState, action: ChatAction): ChatState {
       const earlyStatuses = { ...state.earlyStatuses }
       const early = earlyStatuses[key]
       delete earlyStatuses[key]
+      const current = messages.find((message) => message.id === action.id)!
+      const nextId = action.patch.id ?? current.id
+      const echo = messages.find((message) => message.id === nextId && message.id !== current.id)
+      const updated = {
+        ...current, ...action.patch, ...early,
+        status: [action.patch.status, early?.status, echo?.status].reduce<Delivery>(
+          (status, next) => next ? advanceStatus(status, next) : status, current.status,
+        ),
+      }
       return {
         ...state, earlyStatuses,
         messages: {
           ...state.messages,
-          [action.chatId]: messages.map((message) => message.id === action.id ? {
-            ...message, ...action.patch, ...early,
-            status: advanceStatus(action.patch.status ? advanceStatus(message.status, action.patch.status) : message.status, early?.status ?? message.status),
-          } : message),
+          [action.chatId]: [...messages.filter((message) => message.id !== action.id && message.id !== nextId), updated]
+            .sort((a, b) => a.timestamp - b.timestamp),
         },
       }
     }

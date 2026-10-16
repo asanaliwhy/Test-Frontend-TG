@@ -9,7 +9,8 @@ export function notificationActions(body: WebhookBody): ChatAction[] {
       status: statuses[body.status], ...(body.status === 'failed' ? { error: 'Telegram не доставил сообщение. Проверьте контакт и ограничения аккаунта.' } : {}),
     } }]
   }
-  if (body.typeWebhook !== 'incomingMessageReceived') return []
+  const outgoing = ['outgoingMessageReceived', 'outgoingAPIMessageReceived'].includes(body.typeWebhook)
+  if (body.typeWebhook !== 'incomingMessageReceived' && !outgoing) return []
   const chatId = body.senderData?.chatId
   const data = body.messageData
   const text = data?.typeMessage === 'textMessage' ? data.textMessageData?.textMessage
@@ -17,6 +18,7 @@ export function notificationActions(body: WebhookBody): ChatAction[] {
   if (!chatId || !body.idMessage || typeof text !== 'string' || !Number.isFinite(body.timestamp)) return []
   return [{ type: 'message', name: body.senderData?.chatName || body.senderData?.senderName,
     phone: body.senderData?.senderPhoneNumber ? String(body.senderData.senderPhoneNumber) : undefined,
-    message: { id: body.idMessage, chatId, text, timestamp: body.timestamp! * 1000, direction: 'incoming', status: 'delivered' },
+    message: { id: body.idMessage, chatId, text, timestamp: body.timestamp! * 1000,
+      direction: outgoing ? 'outgoing' : 'incoming', status: outgoing ? 'sent' : 'delivered' },
   }]
 }

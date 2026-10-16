@@ -11,6 +11,7 @@ export function SettingsNotice({ api }: { api: ChatApi }) {
       if (controller.signal.aborted) return
       if (settings.webhookUrl) setNotice('Для получения ответов очистите webhookUrl в настройках инстанса. Внешний webhook сейчас занимает очередь уведомлений.')
       else if (settings.incomingWebhook !== 'yes') setNotice('Включите incomingWebhook в настройках инстанса, чтобы видеть входящие сообщения.')
+      else if (settings.outgoingMessageWebhook !== 'yes') setNotice('Включите «Получать уведомления о сообщениях, отправленных с телефона» (outgoingMessageWebhook) в GREEN-API, чтобы видеть здесь сообщения из Telegram на телефоне.')
       else if (settings.outgoingWebhook !== 'yes') setNotice('Включите outgoingWebhook в настройках инстанса, чтобы видеть статусы доставки.')
     }).catch((error: unknown) => { if (!controller.signal.aborted) setNotice(`Не удалось проверить настройки уведомлений. ${errorMessage(error)}`) })
     return () => controller.abort()
