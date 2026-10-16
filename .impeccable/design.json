@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-16T16:00:00Z",
+  "title": "Design System: Telegram GREEN-API",
+  "extensions": {
+    "shadows": [
+      { "name": "workspace", "value": "0 12px 50px #21394e0b", "purpose": "Separate desktop workspace from canvas." },
+      { "name": "connection-form", "value": "0 16px 60px #21394e0b", "purpose": "Lift the connection form." }
+    ],
+    "motion": [{ "name": "control-hover", "value": "background .15s", "purpose": "Button hover feedback, disabled by reduced motion." }],
+    "breakpoints": [
+      { "name": "mobile-chat", "value": "700px" },
+      { "name": "mobile-connect", "value": "760px" },
+      { "name": "compact-sidebar", "value": "1050px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary button", "kind": "button", "refersTo": "button-primary",
+      "description": "Connect or start a conversation.",
+      "html": "<button class=\"ds-primary\">Подключиться</button>",
+      "css": ".ds-primary{border:0;border-radius:10px;padding:13px 20px;background:var(--accent,#007eb8);color:white;font:750 13px/1.5 Manrope,sans-serif;cursor:pointer}.ds-primary:hover{background:var(--accent-hover,#006b9d)}.ds-primary:focus-visible{outline:3px solid #007eb8;outline-offset:3px}"
+    },
+    {
+      "name": "Secondary button", "kind": "button", "description": "Open the demo or start a secondary action.",
+      "html": "<button class=\"ds-secondary\">Открыть демо</button>",
+      "css": ".ds-secondary{border:0;border-radius:10px;padding:13px 20px;background:#eaf5fc;color:var(--accent,#007eb8);font:750 13px/1.5 Manrope,sans-serif;cursor:pointer}.ds-secondary:hover{background:#dbeef9}.ds-secondary:focus-visible{outline:3px solid #007eb8;outline-offset:3px}"
+    },
+    {
+      "name": "Phone input", "kind": "input", "description": "Labelled international phone field.",
+      "html": "<label class=\"ds-field\">Номер телефона<input placeholder=\"+7 700 123 45 67\" type=\"tel\"></label>",
+      "css": ".ds-field{display:grid;gap:8px;color:var(--ink,#192c3c);font:700 13px Manrope,sans-serif}.ds-field input{padding:13px 14px;border:1px solid #b7c7d3;border-radius:10px;color:var(--ink,#192c3c);font:500 13px Manrope,sans-serif}.ds-field input::placeholder{color:#576b7c}.ds-field input:focus-visible{outline:3px solid #007eb8;outline-offset:3px}"
+    },
+    {
+      "name": "Selected conversation", "kind": "nav", "description": "Active chat row.",
+      "html": "<button class=\"ds-chat\">Анна Смирнова<span>Начните разговор</span></button>",
+      "css": ".ds-chat{display:grid;gap:7px;text-align:left;border:0;border-radius:10px;background:#e8f3fb;color:var(--ink,#192c3c);padding:15px 12px;font:750 12px Manrope,sans-serif;width:100%;cursor:pointer}.ds-chat span{font-size:11px;color:#576b7c;font-weight:500}.ds-chat:hover{background:#dbeef9}.ds-chat:focus-visible{outline:3px solid #007eb8;outline-offset:3px}"
+    },
+    {
+      "name": "Outgoing bubble", "kind": "custom", "description": "Text and timestamp for an outgoing message.",
+      "html": "<article class=\"ds-bubble\">Привет! Как дела?<small>12:34</small></article>",
+      "css": ".ds-bubble{width:fit-content;max-width:78%;border-radius:14px 14px 4px 14px;padding:12px 14px 8px;background:var(--outgoing,#deeffa);color:var(--ink,#192c3c);font:400 13px/1.8 Manrope,sans-serif}.ds-bubble small{display:block;text-align:right;color:#526c7d;font-size:9px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Привычный разговор",
+    "overview": "Минимальный messenger-интерфейс, следующий заданию: список контактов, активная переписка и поле ввода.",
+    "keyCharacteristics": ["Светлые рабочие поверхности", "Синий акцент действий", "Отдельные состояния доставки"],
+    "rules": [],
+    "dos": ["Do: сохранять отдельные визуальные состояния подключения, отправки, очереди и ошибки.", "Do: сокращать превью в списке, сохраняя полный текст в переписке."],
+    "donts": ["Don't: подменять реальный статус доставки успешным HTTP-ответом.", "Don't: добавлять декоративные элементы, отвлекающие от переписки."]
+  }
+}
