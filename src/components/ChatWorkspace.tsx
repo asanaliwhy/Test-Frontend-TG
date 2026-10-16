@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ArrowLeft, Info, MessageCircle, Plus, RefreshCw } from 'lucide-react'
 import type { ChatApi } from '../api/types'
+import type { ChatState } from '../chat/store'
 import { useChat } from '../chat/useChat'
 import { Sidebar } from './Sidebar'
 import { NewChat } from './NewChat'
@@ -10,8 +11,8 @@ import { Composer } from './Composer'
 import { SettingsNotice } from './SettingsNotice'
 import './chat.css'
 
-export function ChatWorkspace({ api, demo, onExit }: { api: ChatApi; demo: boolean; onExit: () => void }) {
-  const { state, dispatch, send, status, connectionError, reconnect } = useChat(api)
+export function ChatWorkspace({ api, demo, seed, onExit }: { api: ChatApi; demo: boolean; seed?: ChatState; onExit: () => void }) {
+  const { state, dispatch, send, status, connectionError, reconnect } = useChat(api, seed)
   const [creating, setCreating] = useState(false)
   const [drafts, setDrafts] = useState<Record<string, string>>({})
   const [help, setHelp] = useState(false)

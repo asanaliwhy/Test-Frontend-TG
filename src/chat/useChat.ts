@@ -2,12 +2,13 @@ import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import type { ChatApi } from '../api/types'
 import { errorMessage } from '../api/client'
 import { chatReducer, initialState } from './store'
+import type { ChatState } from './store'
 import { notificationActions } from './events'
 import { pollNotifications } from './polling'
 import type { ConnectionStatus } from './polling'
 
-export function useChat(api: ChatApi) {
-  const [state, dispatch] = useReducer(chatReducer, initialState)
+export function useChat(api: ChatApi, seed: ChatState = initialState) {
+  const [state, dispatch] = useReducer(chatReducer, seed)
   const [status, setStatus] = useState<ConnectionStatus>('connecting')
   const [connectionError, setConnectionError] = useState('')
   const [restart, setRestart] = useState(0)
