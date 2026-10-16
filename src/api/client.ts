@@ -1,4 +1,5 @@
 import type { AccountResult, ChatApi, Credentials, InstanceSettings, Notification } from './types'
+import { createRequestGate, waitForRequest } from './rateLimit'
 
 export class ApiError extends Error {
   constructor(public readonly status: number, message: string) {
@@ -9,13 +10,19 @@ export class ApiError extends Error {
 
 export function createApi(credentials: Credentials): ChatApi {
   const base = `${credentials.apiUrl}/waInstance${credentials.idInstance}`
+  const gate = createRequestGate()
 
   async function request<T>(method: string, options: {
     verb?: string; body?: unknown; suffix?: string; query?: string; signal?: AbortSignal
   } = {}): Promise<T> {
-    const timeout = AbortSignal.timeout(method === 'receiveNotification' ? 40_000 : 20_000)
-    const signal = options.signal ? AbortSignal.any([options.signal, timeout]) : timeout
-    const response = await fetch(
+    const lifetime = options.signal ?? new AbortController().signal
+    // Only reads may be retried. A send with a lost response must never be duplicated.
+    const retryable = ['getStateInstance', 'getSettings', 'getChats', 'getChatHistory'].includes(method)
+    for (let attempt = 0; ; attempt++) {
+      await gate(method, lifetime)
+      const timeout = AbortSignal.timeout(method === 'receiveNotification' ? 40_000 : 20_000)
+      const signal = AbortSignal.any([lifetime, timeout])
+      const response = await fetch(
       `${base}/${method}/${encodeURIComponent(credentials.apiTokenInstance)}${options.suffix ?? ''}${options.query ?? ''}`,
       {
         method: options.verb ?? 'GET', signal,
@@ -24,13 +31,23 @@ export function createApi(credentials: Credentials): ChatApi {
         credentials: 'omit', referrerPolicy: 'no-referrer',
       },
     )
-    if (!response.ok) {
+      if (response.status === 429 && retryable && attempt < 2) {
+        const header = response.headers.get('Retry-After')
+        const seconds = header ? Number(header) : NaN
+        const retryMs = header ? (Number.isFinite(seconds) ? seconds * 1000 : Date.parse(header) - Date.now()) : 0
+        if (!Number.isFinite(retryMs) || retryMs <= 60_000) {
+          await waitForRequest(Math.max(1500 * 2 ** attempt, Number.isFinite(retryMs) ? retryMs : 0), lifetime)
+          continue
+        }
+      }
+      if (!response.ok) {
       // Do not expose provider responses: they can contain URLs with credentials.
       throw new ApiError(response.status, apiErrorMessage(response.status))
+      }
+      const text = await response.text()
+      try { return (text.trim() ? JSON.parse(text) : null) as T }
+      catch { throw new ApiError(502, 'Сервис вернул некорректный ответ. Попробуйте позже.') }
     }
-    const text = await response.text()
-    try { return (text.trim() ? JSON.parse(text) : null) as T }
-    catch { throw new ApiError(502, 'Сервис вернул некорректный ответ. Попробуйте позже.') }
   }
 
   return {
