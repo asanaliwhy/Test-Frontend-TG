@@ -17,7 +17,13 @@ export function useChat(api: ChatApi, seed: ChatState = initialState) {
   useEffect(() => {
     const controller = new AbortController()
     session.current = controller
+    return () => controller.abort()
+  }, [api])
+
+  useEffect(() => {
+    const controller = new AbortController()
     setStatus('connecting')
+    setConnectionError('')
     void pollNotifications({ api, signal: controller.signal,
       onBody: (body) => {
         if (body.typeWebhook === 'stateInstanceChanged' && body.stateInstance !== 'authorized') {
