@@ -77,3 +77,27 @@
 .help-button { margin-left: auto; }
 .mobile-back { display: none; }
 .text-button { border: 0; background: transparent; padding: 5px 4px; display: inline-flex; align-items: center; gap: 5px; color: #006797; text-decoration: underline; text-underline-offset: 3px; font-size: inherit; }
+@media (min-width: 1600px) { .chat-page { padding: 40px; } }
+@media (max-width: 1050px) { .workspace { grid-template-columns: 290px minmax(0, 1fr); } .chat-page { padding: 16px; } .sidebar-brand { padding-left: 16px; padding-right: 12px; } .message { max-width: 88%; } .timeline { padding-left: 5%; padding-right: 5%; } }
+@media (max-width: 700px) {
+  .chat-page { padding: 0; }
+  .workspace { border-radius: 0; display: block; box-shadow: none; }
+  .sidebar { height: 100%; border: 0; }
+  .chat-surface { display: none; height: 100%; }
+  .show-conversation .sidebar { display: none; }
+  .show-conversation .chat-surface { display: flex; }
+  .mobile-back { display: inline-flex; margin-left: -12px; }
+  .conversation-header { padding: 12px 16px; min-height: 76px; gap: 10px; }
+  .contact-heading h2 { font-size: 13px; }
+  .contact-heading p span { display: none; }
+  .avatar-large { width: 40px; height: 40px; font-size: 13px; }
+  .demo-banner { font-size: 9px; padding: 9px 12px; gap: 8px; justify-content: space-between; }
+  .demo-banner span { max-width: 215px; }
+  .demo-banner button { font-size: 9px; text-align: right; }
+  .timeline { padding: 0 14px 14px; }
+  .message { font-size: 12px; max-width: 88%; }
+  .composer-area { padding: 8px 12px max(12px, env(safe-area-inset-bottom)); }
+  .composer-help { font-size: 8px; }
+  .new-chat-body { padding: 32px 24px; }
+  .chat-item { padding: 17px 14px; }
+}
