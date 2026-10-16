@@ -2,6 +2,8 @@
 
 Минимальный Telegram-чат на React и TypeScript: подключение собственного инстанса GREEN-API, создание переписки по номеру телефона, отправка текста и получение ответов через HTTP API. Также есть автономный деморежим.
 
+**Приложение на Vercel:** [test-frontend-tg.vercel.app](https://test-frontend-tg.vercel.app/)
+
 ## Локальный запуск
 
 Нужен **Node.js 22.12+** (в CI используется Node.js 24) и npm.
